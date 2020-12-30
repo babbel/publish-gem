@@ -1,0 +1,29 @@
+name: Publish gem
+description: Publishes RubyGem to GitHub Packages
+
+inputs:
+  gemspec-file:
+    description: Name of the gemspec file
+    required: false
+    default: "*.gemspec"
+
+runs:
+  using: composite
+
+  steps:
+    - name: Create ~/.gem/crendentials file
+      shell: bash
+      run: |
+        mkdir -p $HOME/.gem
+        echo -e "---\n:github: Bearer ${{ github.token }}" > $HOME/.gem/credentials
+        chmod 0600 $HOME/.gem/credentials
+
+    - name: Build gem
+      shell: bash
+      run: |
+        gem build ${{ inputs.gemspec-file }}
+
+    - name: Publish gem
+      shell: bash
+      run: |
+        gem push *.gem --key github --host https://rubygems.pkg.github.com/${{ github.repository_owner }}
