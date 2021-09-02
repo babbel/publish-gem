@@ -6,6 +6,10 @@ inputs:
     description: Name of the gemspec file
     required: false
     default: "*.gemspec"
+  working-directory:
+    description: Path of the gem, usually containing the gemspec file
+    required: false
+    default: "."
 
 runs:
   using: composite
@@ -20,10 +24,12 @@ runs:
 
     - name: Build gem
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: |
         gem build ${{ inputs.gemspec-file }}
 
     - name: Publish gem
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: |
         gem push *.gem --key github --host https://rubygems.pkg.github.com/${{ github.repository_owner }}
